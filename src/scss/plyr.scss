@@ -557,6 +557,21 @@
         }
     }
 
+    input[data-plyr="seek-loop"] {
+        position: absolute;
+        pointer-events: none;
+
+        top: 0;
+
+        &::-webkit-slider-thumb {
+            pointer-events: all;
+        }
+
+        &::-moz-range-thumb {
+            pointer-events: all;
+        }
+    }
+
     // Seek tooltip to show time
     .plyr__tooltip {
         left: 0;

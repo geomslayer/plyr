@@ -829,6 +829,8 @@
                 html.push('<span class="plyr__progress">',
                     '<label for="seek{id}" class="plyr__sr-only">Seek</label>',
                     '<input id="seek{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
+                    '<input class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek-loop">',
+                    '<input class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek-loop">',
                     '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
                     '<progress class="plyr__progress--buffer" max="100" value="0">',
                         '<span>0</span>% ' + config.i18n.buffered,
