@@ -76,7 +76,9 @@
                 forward:        '[data-plyr="fast-forward"]',
                 mute:           '[data-plyr="mute"]',
                 captions:       '[data-plyr="captions"]',
-                fullscreen:     '[data-plyr="fullscreen"]'
+                fullscreen:     '[data-plyr="fullscreen"]',
+                loop:           '[data-plyr="loop"]',
+                remove:         '[data-plyr="loop-remove"]'
             },
             volume: {
                 input:          '[data-plyr="volume"]',
@@ -105,6 +107,7 @@
             tooltip:            'plyr__tooltip',
             hidden:             'plyr__sr-only',
             hideControls:       'plyr--hide-controls',
+            looped:             'plyr--looped',
             isIos:              'plyr--is-ios',
             isTouch:            'plyr--is-touch',
             captions: {
@@ -129,7 +132,7 @@
             enabled:            true,
             key:                'plyr'
         },
-        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen'],
+        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'loop', 'fullscreen'],
         i18n: {
             restart:            'Restart',
             rewind:             'Rewind {seektime} secs',
@@ -173,7 +176,9 @@
             mute:               null,
             volume:             null,
             captions:           null,
-            fullscreen:         null
+            fullscreen:         null,
+            loop:               null,
+            remove:             null
         },
         // Events to watch on HTML5 media elements
         events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied'],
@@ -719,6 +724,8 @@
         plyr.media = media;
         var original = media.cloneNode(true);
 
+        plyr.looped = false;
+
         // Trigger events, with plyr instance passed
         function _triggerEvent(element, type, bubbles, properties) {
             _event(element, type, bubbles, _extend({}, properties, {
@@ -885,6 +892,20 @@
                         '<svg class="icon--captions-on"><use xlink:href="' + iconPath + '-captions-on" /></svg>',
                         '<svg><use xlink:href="' + iconPath+ '-captions-off" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
+                    '</button>'
+                );
+            }
+
+            // Toggle loop button
+            if (_inArray(config.controls, 'loop')) {
+                html.push(
+                    '<button type="button" data-plyr="loop">',
+                        '<svg><use xlink:href="' + iconPath + '-add" /></svg>',
+                        '<span class="plyr__sr-only">Add loop</span>',
+                    '</button>',
+                    '<button type="button" data-plyr="loop-remove">',
+                        '<svg><use xlink:href="' + iconPath + '-remove" /></svg>',
+                        '<span class="plyr__sr-only">Remove loop</span>',
                     '</button>'
                 );
             }
@@ -1341,6 +1362,8 @@
                 plyr.buttons.rewind           = _getElement(config.selectors.buttons.rewind);
                 plyr.buttons.forward          = _getElement(config.selectors.buttons.forward);
                 plyr.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
+                plyr.buttons.loop             = _getElement(config.selectors.buttons.loop);
+                plyr.buttons.remove           = _getElement(config.selectors.buttons.remove);
 
                 // Inputs
                 plyr.buttons.mute             = _getElement(config.selectors.buttons.mute);
@@ -1995,6 +2018,14 @@
             }
 
             return toggle;
+        }
+
+        function _loop() {
+
+        }
+
+        function _removeLoop() {
+
         }
 
         // Rewind
@@ -2871,6 +2902,29 @@
                 }
             }
 
+            function toggleLoop() {
+                _toggleClass(plyr.container, config.classes.looped, !plyr.looped);
+
+                var target = plyr.buttons[plyr.looped ? 'loop' : 'loop-remove'],
+                    trigger = plyr.buttons[plyr.looped ? 'loop-remove' : 'loop'];
+
+                plyr.looped = !plyr.looped;
+
+                // Setup focus and tab focus
+                if (target) {
+                    var hadTabFocus = _hasClass(trigger, config.classes.tabFocus);
+
+                    setTimeout(function() {
+                        target.focus();
+
+                        if (hadTabFocus) {
+                            _toggleClass(trigger, config.classes.tabFocus, false);
+                            _toggleClass(target, config.classes.tabFocus, true);
+                        }
+                    }, 100);
+                }
+            }
+
             // Get the focused element
             function getFocusElement() {
                 var focused = document.activeElement;
@@ -3030,6 +3084,12 @@
                     _toggleClass(element, 'tab-focus', false);
                 });
             }
+
+            // Add loop
+            _proxyListener(plyr.buttons.loop, 'click', config.listeners.loop, toggleLoop);
+
+            // Remove loop
+            _proxyListener(plyr.buttons.remove, 'click', config.listeners.remove, toggleLoop);
 
             // Play
             _proxyListener(plyr.buttons.play, 'click', config.listeners.play, togglePlay);

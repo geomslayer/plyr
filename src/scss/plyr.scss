@@ -423,6 +423,13 @@
 .plyr--playing .plyr__controls [data-plyr='pause'] {
     display: inline-block;
 }
+.plyr__controls [data-plyr='loop-remove'],
+.plyr--looped .plyr__controls [data-plyr='loop'] {
+    display: none;
+}
+.plyr--looped .plyr__controls [data-plyr='loop-remove'] {
+    display: inline-block;
+}
 
 // Change icons on state change
 .plyr--fullscreen-active .icon--exit-fullscreen,

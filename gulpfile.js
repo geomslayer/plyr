@@ -208,7 +208,7 @@ gulp.task("watch", function () {
 
 // Default gulp task
 gulp.task("default", function(){
-    run(tasks.js, tasks.less, tasks.sprite, "watch");
+    run(tasks.js, tasks.scss, tasks.sprite, "watch");
 });
 
 // Publish a version to CDN and demo
@@ -333,5 +333,5 @@ gulp.task("open", function () {
 
 // Do everything
 gulp.task("publish", function () {
-    run(tasks.js, tasks.less, tasks.sprite, "cdn", "demo", "symlinks");
+    run(tasks.js, tasks.scss, tasks.sprite, "cdn", "demo", "symlinks");
 });
