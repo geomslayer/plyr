@@ -2031,12 +2031,48 @@
             return toggle;
         }
 
-        function _loop() {
+        function changeLoop(left, right) {
+            if (_is.number(left) && _is.number(right)) {
+                plyr.loop.min = Math.min(left, right);
+                plyr.loop.max = Math.max(left, right);
+            } else {
+                var duration = _getDuration();
+                var thumbs = plyr.buttons.seekloops;
+                var timeBorders = [
+                    thumbs[0].value / thumbs[0].max * duration,
+                    thumbs[1].value / thumbs[1].max * duration
+                ];
+                plyr.loop.min = Math.min(timeBorders[0], timeBorders[1]);
+                plyr.loop.max = Math.max(timeBorders[0], timeBorders[1]);
+            }
+            if (plyr.loop.min < 0) {
+                plyr.loop.min = 0;
+            } else if (plyr.loop.min > duration) {
+                plyr.loop.min = duration;
+            }
+            if (plyr.loop.max < 0) {
+                plyr.loop.max = 0;
+            } else if (plyr.loop.max > duration) {
+                plyr.loop.max = duration;
+            }
+            _log('Loop: ' + Math.floor(plyr.loop.min / 60) + ':' + (plyr.loop.min % 60).toFixed(2) + ' - '
+                + Math.floor(plyr.loop.max / 60) + ':' + (plyr.loop.max % 60).toFixed(2));
+        }
 
+        function _loop() {
+            var val = parseFloat(plyr.buttons.seek.value);
+            var diff = plyr.buttons.seek.max / 10;
+            var duration = _getDuration();
+
+            changeLoop((val - diff) / plyr.buttons.seek.max * duration,
+                (val + diff) / plyr.buttons.seek.max * duration);
+
+            plyr.buttons.seekloops[1].value = val + diff;
+            plyr.buttons.seekloops[0].value = val - diff;
         }
 
         function _removeLoop() {
-
+            // pass
         }
 
         // Rewind
@@ -2433,9 +2469,9 @@
                     // Video playing
                     case 'timeupdate':
                     case 'seeking':
-                        if (plyr.controls.pressed) {
-                            return;
-                        }
+                        // if (plyr.controls.pressed) {
+                        //     return;
+                        // }
 
                         value = _getPercentage(plyr.media.currentTime, duration);
 
@@ -2935,6 +2971,10 @@
                 var target = plyr.buttons[plyr.loop.looped ? 'loop' : 'loop-remove'],
                     trigger = plyr.buttons[plyr.loop.looped ? 'loop-remove' : 'loop'];
 
+                if (!plyr.loop.looped) {
+                    _loop();
+                }
+
                 plyr.loop.looped = !plyr.loop.looped;
 
                 // Setup focus and tab focus
@@ -2950,34 +2990,6 @@
                         }
                     }, 100);
                 }
-            }
-
-            function changeLoop(left, right) {
-                if (_is.number(left) && _is.number(right)) {
-                    plyr.loop.min = Math.min(left, right);
-                    plyr.loop.max = Math.max(left, right);
-                } else {
-                    var duration = _getDuration();
-                    var thumbs = plyr.buttons.seekloops;
-                    var timeBorders = [
-                        thumbs[0].value / thumbs[0].max * duration,
-                        thumbs[1].value / thumbs[1].max * duration
-                    ];
-                    plyr.loop.min = Math.min(timeBorders[0], timeBorders[1]);
-                    plyr.loop.max = Math.max(timeBorders[0], timeBorders[1]);
-                }
-                if (plyr.loop.min < 0) {
-                    plyr.loop.min = 0;
-                } else if (plyr.loop.min > duration) {
-                    plyr.loop.min = duration;
-                }
-                if (plyr.loop.max < 0) {
-                    plyr.loop.max = 0;
-                } else if (plyr.loop.max > duration) {
-                    plyr.loop.max = duration;
-                }
-                _log(Math.floor(plyr.loop.min / 60) + ':' + Math.floor(plyr.loop.min % 60) + ' - '
-                    + Math.floor(plyr.loop.max / 60) + ':' + Math.floor(plyr.loop.max % 60));
             }
 
             // Get the focused element

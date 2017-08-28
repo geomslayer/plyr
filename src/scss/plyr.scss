@@ -430,6 +430,9 @@
 .plyr--looped .plyr__controls [data-plyr='loop-remove'] {
     display: inline-block;
 }
+.plyr--looped .plyr__progress input[data-plyr="seek-loop"] {
+    display: block;
+}
 
 // Change icons on state change
 .plyr--fullscreen-active .icon--exit-fullscreen,
@@ -560,6 +563,7 @@
     input[data-plyr="seek-loop"] {
         position: absolute;
         pointer-events: none;
+        display: none;
 
         top: 0;
 
