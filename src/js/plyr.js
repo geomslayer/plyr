@@ -78,7 +78,8 @@
                 captions:       '[data-plyr="captions"]',
                 fullscreen:     '[data-plyr="fullscreen"]',
                 loop:           '[data-plyr="loop"]',
-                remove:         '[data-plyr="loop-remove"]'
+                remove:         '[data-plyr="loop-remove"]',
+                seekloop:       '[data-plyr="seek-loop"]'
             },
             volume: {
                 input:          '[data-plyr="volume"]',
@@ -178,7 +179,8 @@
             captions:           null,
             fullscreen:         null,
             loop:               null,
-            remove:             null
+            remove:             null,
+            seekloop:           null
         },
         // Events to watch on HTML5 media elements
         events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied'],
@@ -724,7 +726,11 @@
         plyr.media = media;
         var original = media.cloneNode(true);
 
-        plyr.looped = false;
+        plyr.loop = {
+            looped: false,
+            min: 0,
+            max: 0
+        };
 
         // Trigger events, with plyr instance passed
         function _triggerEvent(element, type, bubbles, properties) {
@@ -1364,8 +1370,6 @@
                 plyr.buttons.rewind           = _getElement(config.selectors.buttons.rewind);
                 plyr.buttons.forward          = _getElement(config.selectors.buttons.forward);
                 plyr.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
-                plyr.buttons.loop             = _getElement(config.selectors.buttons.loop);
-                plyr.buttons.remove           = _getElement(config.selectors.buttons.remove);
 
                 // Inputs
                 plyr.buttons.mute             = _getElement(config.selectors.buttons.mute);
@@ -1395,6 +1399,11 @@
                 plyr.duration                 = _getElement(config.selectors.duration);
                 plyr.currentTime              = _getElement(config.selectors.currentTime);
                 plyr.seekTime                 = _getElements(config.selectors.seekTime);
+
+                // Loop
+                plyr.buttons.loop             = _getElement(config.selectors.buttons.loop);
+                plyr.buttons.remove           = _getElement(config.selectors.buttons.remove);
+                plyr.buttons.seekloops        = _getElements(config.selectors.buttons.seekloop);
 
                 return true;
             }
@@ -2070,6 +2079,15 @@
                 targetTime = duration;
             }
 
+            // Restrict main seek thumb between seek-loop thumbs
+            if (plyr.loop.looped) {
+                if (targetTime < plyr.loop.min) {
+                    targetTime = plyr.loop.min + 0.1;
+                } else if (targetTime > plyr.loop.max) {
+                    targetTime = plyr.loop.max - 0.1;
+                }
+            }
+
             // Update seek range and progress
             _updateSeekDisplay(targetTime);
 
@@ -2547,6 +2565,13 @@
                 return;
             }
 
+            // Listen for time change
+            var curTime = plyr.media.currentTime;
+            if (plyr.loop.looped && (curTime < plyr.loop.min || curTime > plyr.loop.max)) {
+                _seek(plyr.loop.min + 0.1);
+                return;
+            }
+
             // Playing progress
             _updateProgress(event);
         }
@@ -2905,12 +2930,12 @@
             }
 
             function toggleLoop() {
-                _toggleClass(plyr.container, config.classes.looped, !plyr.looped);
+                _toggleClass(plyr.container, config.classes.looped, !plyr.loop.looped);
 
-                var target = plyr.buttons[plyr.looped ? 'loop' : 'loop-remove'],
-                    trigger = plyr.buttons[plyr.looped ? 'loop-remove' : 'loop'];
+                var target = plyr.buttons[plyr.loop.looped ? 'loop' : 'loop-remove'],
+                    trigger = plyr.buttons[plyr.loop.looped ? 'loop-remove' : 'loop'];
 
-                plyr.looped = !plyr.looped;
+                plyr.loop.looped = !plyr.loop.looped;
 
                 // Setup focus and tab focus
                 if (target) {
@@ -2925,6 +2950,34 @@
                         }
                     }, 100);
                 }
+            }
+
+            function changeLoop(left, right) {
+                if (_is.number(left) && _is.number(right)) {
+                    plyr.loop.min = Math.min(left, right);
+                    plyr.loop.max = Math.max(left, right);
+                } else {
+                    var duration = _getDuration();
+                    var thumbs = plyr.buttons.seekloops;
+                    var timeBorders = [
+                        thumbs[0].value / thumbs[0].max * duration,
+                        thumbs[1].value / thumbs[1].max * duration
+                    ];
+                    plyr.loop.min = Math.min(timeBorders[0], timeBorders[1]);
+                    plyr.loop.max = Math.max(timeBorders[0], timeBorders[1]);
+                }
+                if (plyr.loop.min < 0) {
+                    plyr.loop.min = 0;
+                } else if (plyr.loop.min > duration) {
+                    plyr.loop.min = duration;
+                }
+                if (plyr.loop.max < 0) {
+                    plyr.loop.max = 0;
+                } else if (plyr.loop.max > duration) {
+                    plyr.loop.max = duration;
+                }
+                _log(Math.floor(plyr.loop.min / 60) + ':' + Math.floor(plyr.loop.min % 60) + ' - '
+                    + Math.floor(plyr.loop.max / 60) + ':' + Math.floor(plyr.loop.max % 60));
             }
 
             // Get the focused element
@@ -3110,6 +3163,10 @@
 
             // Seek
             _proxyListener(plyr.buttons.seek, inputEvent, config.listeners.seek, _seek);
+
+            // Seek loop
+            _proxyListener(plyr.buttons.seekloops[0], inputEvent, config.listeners.seekloop, changeLoop);
+            _proxyListener(plyr.buttons.seekloops[1], inputEvent, config.listeners.seekloop, changeLoop);
 
             // Set volume
             _proxyListener(plyr.volume.input, inputEvent, config.listeners.volume, function() {
