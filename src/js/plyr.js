@@ -2032,12 +2032,26 @@
         }
 
         function changeLoop(left, right) {
+            var thumbs = plyr.buttons.seekloops;
+            var duration = _getDuration();
             if (_is.number(left) && _is.number(right)) {
                 plyr.loop.min = Math.min(left, right);
                 plyr.loop.max = Math.max(left, right);
+
+                if (plyr.loop.min < 0) {
+                    plyr.loop.min = 0;
+                } else if (plyr.loop.min > duration) {
+                    plyr.loop.min = duration;
+                }
+                if (plyr.loop.max < 0) {
+                    plyr.loop.max = 0;
+                } else if (plyr.loop.max > duration) {
+                    plyr.loop.max = duration;
+                }
+
+                thumbs[0].value = plyr.loop.min / duration * thumbs[0].max;
+                thumbs[1].value = plyr.loop.max / duration * thumbs[1].max;
             } else {
-                var duration = _getDuration();
-                var thumbs = plyr.buttons.seekloops;
                 var timeBorders = [
                     thumbs[0].value / thumbs[0].max * duration,
                     thumbs[1].value / thumbs[1].max * duration
@@ -2045,16 +2059,13 @@
                 plyr.loop.min = Math.min(timeBorders[0], timeBorders[1]);
                 plyr.loop.max = Math.max(timeBorders[0], timeBorders[1]);
             }
-            if (plyr.loop.min < 0) {
-                plyr.loop.min = 0;
-            } else if (plyr.loop.min > duration) {
-                plyr.loop.min = duration;
+
+            if (plyr.media.currentTime < plyr.loop.min) {
+                _seek(plyr.loop.min + 0.1);
+            } else if (plyr.media.currentTime > plyr.loop.max) {
+                _seek(plyr.loop.max - 0.1);
             }
-            if (plyr.loop.max < 0) {
-                plyr.loop.max = 0;
-            } else if (plyr.loop.max > duration) {
-                plyr.loop.max = duration;
-            }
+
             _log('Loop: ' + Math.floor(plyr.loop.min / 60) + ':' + (plyr.loop.min % 60).toFixed(2) + ' - '
                 + Math.floor(plyr.loop.max / 60) + ':' + (plyr.loop.max % 60).toFixed(2));
         }
@@ -2064,15 +2075,22 @@
             var diff = plyr.buttons.seek.max / 10;
             var duration = _getDuration();
 
-            changeLoop((val - diff) / plyr.buttons.seek.max * duration,
-                (val + diff) / plyr.buttons.seek.max * duration);
-
-            plyr.buttons.seekloops[1].value = val + diff;
-            plyr.buttons.seekloops[0].value = val - diff;
+            changeLoop(
+                (val - diff) / plyr.buttons.seek.max * duration,
+                (val + diff) / plyr.buttons.seek.max * duration
+            );
         }
 
         function _removeLoop() {
             // pass
+        }
+
+        function _setLeftLoop() {
+            changeLoop(plyr.media.currentTime, plyr.loop.max);
+        }
+
+        function _setRightLoop() {
+            changeLoop(plyr.loop.min, plyr.media.currentTime);
         }
 
         // Rewind
@@ -2968,8 +2986,8 @@
             function toggleLoop() {
                 _toggleClass(plyr.container, config.classes.looped, !plyr.loop.looped);
 
-                var target = plyr.buttons[plyr.loop.looped ? 'loop' : 'loop-remove'],
-                    trigger = plyr.buttons[plyr.loop.looped ? 'loop-remove' : 'loop'];
+                var target = plyr.buttons[plyr.loop.looped ? 'loop' : 'remove'],
+                    trigger = plyr.buttons[plyr.loop.looped ? 'remove' : 'loop'];
 
                 if (!plyr.loop.looped) {
                     _loop();
@@ -3117,6 +3135,10 @@
                         case 70: _toggleFullscreen(); break;
                         // C key
                         case 67: if (!held) { _toggleCaptions(); } break;
+                        // L key
+                        case 76: if (plyr.loop.looped) { _setLeftLoop(); } break;
+                        // R key
+                        case 82: if (plyr.loop.looped) { _setRightLoop(); } break;
                     }
 
                     // Escape is handle natively when in full screen
