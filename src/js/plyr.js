@@ -913,11 +913,11 @@
                 html.push(
                     '<button type="button" data-plyr="loop">',
                         '<svg><use xlink:href="' + iconPath + '-add" /></svg>',
-                        '<span class="plyr__sr-only">Add loop</span>',
+                        '<span class="plyr__sr-only">Looped Playback</span>',
                     '</button>',
                     '<button type="button" data-plyr="loop-remove">',
                         '<svg><use xlink:href="' + iconPath + '-remove" /></svg>',
-                        '<span class="plyr__sr-only">Remove loop</span>',
+                        '<span class="plyr__sr-only">Normal Playback</span>',
                     '</button>'
                 );
             }

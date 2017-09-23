@@ -14,7 +14,7 @@ $plyr-sr-only-important:                true !default;
 $plyr-color-main:                       #F10899 !default;
 
 // Font sizes
-$plyr-font-family:                      Avenir, 'Avenir Next', 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif !default;
+$plyr-font-family:                      'Open Sans', 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif !default;
 $plyr-font-size-small:                  14px !default;
 $plyr-font-size-base:                   16px !default;
 
@@ -26,8 +26,8 @@ $plyr-font-size-captions-medium:        ceil($plyr-font-size-base * 1.5) !defaul
 $plyr-font-size-captions-large:         ($plyr-font-size-base * 2) !default;
 
 // Controls
-$plyr-control-icon-size:                18px !default;
-$plyr-control-spacing:                  10px !default;
+$plyr-control-icon-size:                24px !default;
+$plyr-control-spacing:                  8px !default;
 $plyr-control-padding:                  ($plyr-control-spacing * .7) !default;
 $plyr-video-controls-bg:                #000 !default;
 $plyr-video-control-color:              #fff !default;
