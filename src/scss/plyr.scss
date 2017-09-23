@@ -327,6 +327,11 @@
             margin-left: $plyr-control-spacing;
         }
     }
+
+    [data-plyr="space"] {
+        flex-grow: 1;
+    }
+
 }
 // Hide controls
 .plyr--hide-controls .plyr__controls {
@@ -340,7 +345,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    padding: ($plyr-control-spacing * 5) $plyr-control-spacing $plyr-control-spacing;
+    padding: ($plyr-control-spacing * 2) $plyr-control-spacing $plyr-control-spacing / 2;
     background: linear-gradient(transparentize($plyr-video-controls-bg, 1), transparentize($plyr-video-controls-bg, .5));
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
@@ -351,7 +356,7 @@
         // Hover and tab focus
         &.tab-focus:focus,
         &:hover {
-            background: $plyr-video-control-bg-hover;
+            //background: $plyr-video-control-bg-hover;
             color: $plyr-video-control-color-hover;
         }
     }
@@ -542,8 +547,10 @@
 // <progress> element
 .plyr__progress {
     display: none;
-    position: relative;
-    flex: 1;
+    position: absolute;
+    top: $plyr-control-spacing;
+    left: 0;
+    right: $plyr-control-spacing;
 
     input[type="range"] {
         position: relative;
@@ -580,6 +587,14 @@
     .plyr__tooltip {
         left: 0;
     }
+
+    &:hover {
+        .plyr__progress--buffer,
+        .plyr__progress--played {
+            height: $plyr-range-track-height;
+            margin: -($plyr-range-track-height / 2) 0 0;
+        }
+    }
 }
 .plyr .plyr__progress {
     display: inline-block;
@@ -589,32 +604,41 @@
 .plyr__progress--played,
 .plyr__volume--display {
     position: absolute;
-    left: 0;
+    left: $plyr-range-track-height;
+    right: $plyr-range-track-height;
+    width: auto;
     top: 50%;
-    width: 100%;
-    height: $plyr-range-track-height;
-    margin: -($plyr-range-track-height / 2) 0 0;
+    height: $plyr-range-track-height / 2;
+    margin: -($plyr-range-track-height / 3) 0 0;
     padding: 0;
     vertical-align: top;
     appearance: none;
     border: none;
-    border-radius: 100px;
+    //border-radius: 100px;
+
+    transition: height .2s ease, margin .2s ease;
 
     &::-webkit-progress-bar {
         background: transparent;
     }
     &::-webkit-progress-value {
         background: currentColor;
-        border-radius: 100px;
-        min-width: $plyr-range-track-height;
+        //border-radius: 100px;
+        border-bottom-right-radius: 100px;
+        border-top-right-radius: 100px;
+        //min-width: $plyr-range-track-height;
     }
     &::-moz-progress-bar {
         background: currentColor;
-        border-radius: 100px;
-        min-width: $plyr-range-track-height;
+        border-bottom-right-radius: 100px;
+        border-top-right-radius: 100px;
+        //border-radius: 100px;
+        //min-width: $plyr-range-track-height;
     }
     &::-ms-fill {
-        border-radius: 100px;
+        border-bottom-right-radius: 100px;
+        border-top-right-radius: 100px;
+        //border-radius: 100px;
     }
 }
 .plyr__progress--played,
@@ -622,20 +646,23 @@
     z-index: 1;
     color: $plyr-range-selected-bg;
     background: transparent;
-    transition: none;
 
     &::-webkit-progress-value {
-        min-width: $plyr-range-track-height;
-        max-width: 99%;
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
+        //min-width: $plyr-range-track-height;
+        //max-width: 99%;
+        //border-top-right-radius: 0;
+        //border-bottom-right-radius: 0;
+        border-bottom-right-radius: 100px;
+        border-top-right-radius: 100px;
         transition: none;
     }
     &::-moz-progress-bar {
-        min-width: $plyr-range-track-height;
-        max-width: 99%;
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
+        //min-width: $plyr-range-track-height;
+        //max-width: 99%;
+        //border-top-right-radius: 0;
+        //border-bottom-right-radius: 0;
+        border-bottom-right-radius: 100px;
+        border-top-right-radius: 100px;
         transition: none;
     }
     &::-ms-fill {
@@ -717,6 +744,13 @@
 // --------------------------------------------------------------
 .plyr__volume {
     display: none;
+
+    &:hover {
+        .plyr__volume--display {
+            height: $plyr-range-track-height;
+            margin: -($plyr-range-track-height / 2) 0 0;
+        }
+    }
 }
 .plyr .plyr__volume {
     flex: 1;

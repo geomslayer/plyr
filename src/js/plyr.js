@@ -133,7 +133,7 @@
             enabled:            true,
             key:                'plyr'
         },
-        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'loop', 'fullscreen'],
+        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'loop', 'fullscreen', 'duration'],
         i18n: {
             restart:            'Restart',
             rewind:             'Rewind {seektime} secs',
@@ -777,7 +777,7 @@
                 html.push(
                     '<button type="button" data-plyr="play" class="plyr__play-large">',
                         '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
+                        // '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
                     '</button>'
                 );
             }
@@ -789,7 +789,7 @@
                 html.push(
                     '<button type="button" data-plyr="restart">',
                         '<svg><use xlink:href="' + iconPath + '-restart" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
+                        // '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
                     '</button>'
                 );
             }
@@ -810,11 +810,11 @@
                 html.push(
                     '<button type="button" data-plyr="play">',
                         '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
+                        // '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
                     '</button>',
                     '<button type="button" data-plyr="pause">',
                         '<svg><use xlink:href="' + iconPath + '-pause" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
+                        // '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
                     '</button>'
                 );
             }
@@ -903,6 +903,10 @@
                     '</button>'
                 );
             }
+
+            html.push(
+                '<div data-plyr="space"></div>'
+            );
 
             // Toggle loop button
             if (_inArray(config.controls, 'loop')) {
@@ -2651,6 +2655,8 @@
             }
         }
 
+        var progressShift = 6; // px
+
         // Update hover tooltip for seeking
         function _updateSeekTooltip(event) {
             var duration = _getDuration();
@@ -2663,17 +2669,20 @@
             // Calculate percentage
             var clientRect  = plyr.progress.container.getBoundingClientRect(),
                 percent     = 0,
+                realPercent = 0,
                 visible     = config.classes.tooltip + '--visible';
 
             // Determine percentage, if already visible
             if (!event) {
                 if (_hasClass(plyr.progress.tooltip, visible)) {
-                    percent = plyr.progress.tooltip.style.left.replace('%', '');
+                    realPercent = percent = plyr.progress.tooltip.style.left.replace('%', '');
                 } else {
                     return;
                 }
             } else {
-                percent = ((100 / clientRect.width) * (event.pageX - clientRect.left));
+                percent = ((100 / (clientRect.width - 2 * progressShift))
+                    * (event.pageX - clientRect.left - progressShift));
+                realPercent = ((100 / clientRect.width) * (event.pageX - clientRect.left));
             }
 
             // Set bounds
@@ -2683,11 +2692,17 @@
                 percent = 100;
             }
 
+            if (realPercent < 0) {
+                realPercent = 0;
+            } else if (percent > 100) {
+                realPercent = 100;
+            }
+
             // Display the time a click would seek to
             _updateTimeDisplay(((duration / 100) * percent), plyr.progress.tooltip);
 
             // Set position
-            plyr.progress.tooltip.style.left = percent + "%";
+            plyr.progress.tooltip.style.left = realPercent + "%";
 
             // Show/hide the tooltip
             // If the event is a moues in/out and percentage is inside bounds
