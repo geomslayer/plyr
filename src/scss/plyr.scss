@@ -342,9 +342,11 @@
 
     @media (min-width: $plyr-bp-screen-sm) {
         > button,
-        .plyr__progress,
         .plyr__time {
             margin-left: $plyr-control-spacing;
+        }
+        .plyr__progress {
+            margin-left: 0;
         }
     }
 
@@ -365,7 +367,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    padding: ($plyr-control-spacing * 2) $plyr-control-spacing 0;
+    padding: ($plyr-control-spacing * 2) $plyr-control-spacing $plyr-control-spacing / 4;
     background: linear-gradient(transparentize($plyr-video-controls-bg, 1), transparentize($plyr-video-controls-bg, .5));
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
@@ -418,8 +420,8 @@
 
     svg {
         position: relative;
-        width: 24px;
-        height: 24px;
+        width: 32px;
+        height: 32px;
         display: block;
         fill: currentColor;
     }
@@ -567,9 +569,9 @@
 .plyr__progress {
     display: none;
     position: absolute;
-    top: $plyr-control-spacing;
-    left: 0;
-    right: $plyr-control-spacing;
+    top: 2 * $plyr-control-spacing / 3;
+    left: $plyr-control-spacing / 2;
+    right: $plyr-control-spacing / 2;
 
     input[type="range"] {
         position: relative;
@@ -635,7 +637,7 @@
     border: none;
     //border-radius: 100px;
 
-    transition: height .2s ease, margin .2s ease;
+    transition: height .1s, margin .1s;
 
     &::-webkit-progress-bar {
         background: transparent;
@@ -663,7 +665,6 @@
 .plyr__progress--played,
 .plyr__volume--display {
     z-index: 1;
-    color: $plyr-range-selected-bg;
     background: transparent;
 
     &::-webkit-progress-value {
@@ -688,6 +689,16 @@
         display: none;
     }
 }
+.plyr__progress--played {
+    color: $plyr-range-selected-bg;
+}
+.plyr__volume--display {
+    color: $plyr-video-control-color;
+    height: $plyr-range-volume-track-height;
+    margin: -1px 0 0;
+
+}
+
 .plyr__progress--buffer {
     &::-webkit-progress-value {
         transition: width .2s ease;
@@ -764,10 +775,23 @@
 .plyr__volume {
     display: none;
 
-    &:hover {
-        .plyr__volume--display {
-            height: $plyr-range-track-height;
-            margin: -($plyr-range-track-height / 2) 0 0;
+    input[type="range"] {
+        // WebKit
+        &::-webkit-slider-thumb {
+            background: $plyr-range-thumb-bg;
+            box-shadow: $plyr-range-thumb-shadow;
+        }
+
+        // Mozilla
+        &::-moz-range-thumb {
+            background: $plyr-range-thumb-bg;
+            box-shadow: $plyr-range-thumb-shadow;
+        }
+
+        // Microsoft
+        &::-ms-thumb {
+            background: $plyr-range-thumb-bg;
+            box-shadow: $plyr-range-thumb-shadow;
         }
     }
 }

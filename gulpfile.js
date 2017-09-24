@@ -197,7 +197,7 @@ gulp.task("scss", function(){
 gulp.task("watch", function () {
     // Plyr core
     gulp.watch(paths.plyr.src.js, tasks.js);
-    gulp.watch(paths.plyr.src.less, tasks.less);
+    gulp.watch(paths.plyr.src.scss, tasks.scss);
     gulp.watch(paths.plyr.src.sprite, tasks.sprite);
 
     // Demo
