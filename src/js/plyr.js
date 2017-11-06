@@ -837,10 +837,13 @@
                     '<input id="seek{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
                     '<input class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek-loop">',
                     '<input class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek-loop">',
-                    '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
-                    '<progress class="plyr__progress--buffer" max="100" value="0">',
-                        '<span>0</span>% ' + config.i18n.buffered,
-                    '</progress>');
+                    '<div class="plyr__progress--progress-wrapper">',
+                        '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
+                        '<progress class="plyr__progress--buffer" max="100" value="0">',
+                            '<span>0</span>% ' + config.i18n.buffered,
+                        '</progress>',
+                    '</div>'
+                );
 
                 // Seek tooltip
                 if (config.tooltips.seek) {
@@ -888,7 +891,9 @@
                     '<span class="plyr__volume">',
                         '<label for="volume{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
                         '<input id="volume{id}" class="plyr__volume--input" type="range" min="' + config.volumeMin + '" max="' + config.volumeMax + '" value="' + config.volume + '" data-plyr="volume">',
-                        '<progress class="plyr__volume--display" max="' + config.volumeMax + '" value="' + config.volumeMin + '" role="presentation"></progress>',
+                        '<div class="plyr__volume--progress-wrapper">',
+                            '<progress class="plyr__volume--display" max="' + config.volumeMax + '" value="' + config.volumeMin + '" role="presentation"></progress>',
+                        '</div>',
                     '</span>'
                 );
             }

@@ -621,21 +621,28 @@
     display: inline-block;
 }
 
+.plyr__progress--progress-wrapper,
+.plyr__volume--progress-wrapper {
+    position: absolute;
+    width: auto;
+    height: 100%;
+    top: 0;
+    left: $plyr-range-track-height;
+    right: $plyr-range-track-height;
+}
+
 .plyr__progress--buffer,
 .plyr__progress--played,
 .plyr__volume--display {
     position: absolute;
-    left: $plyr-range-track-height;
-    right: $plyr-range-track-height;
-    width: auto;
     top: 50%;
+    left: 0;
+    width: 100%;
     height: $plyr-range-track-height / 2;
     margin: -($plyr-range-track-height / 3) 0 0;
     padding: 0;
     vertical-align: top;
-    appearance: none;
     border: none;
-    //border-radius: 100px;
 
     transition: height .1s, margin .1s;
 
@@ -644,22 +651,17 @@
     }
     &::-webkit-progress-value {
         background: currentColor;
-        //border-radius: 100px;
         border-bottom-right-radius: 100px;
         border-top-right-radius: 100px;
-        //min-width: $plyr-range-track-height;
     }
     &::-moz-progress-bar {
         background: currentColor;
         border-bottom-right-radius: 100px;
         border-top-right-radius: 100px;
-        //border-radius: 100px;
-        //min-width: $plyr-range-track-height;
     }
     &::-ms-fill {
         border-bottom-right-radius: 100px;
         border-top-right-radius: 100px;
-        //border-radius: 100px;
     }
 }
 .plyr__progress--played,
